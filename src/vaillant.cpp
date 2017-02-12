@@ -16,13 +16,13 @@ byte calculateCRC(byte* data, byte len) {
       checksum = checksum<<1;
     }
 
-    checksum = checksum ^ stringptr[i];
+    checksum = checksum ^ data[i];
   }
   return checksum;
 }
 
 boolean checkCRC(byte* data, byte len) {
-  return calculateCRC(stringptr, len-1) == stringptr[len-1];
+  return calculateCRC(data, len-1) == data[len-1];
 }
 
 char getNumChar(byte num) {
