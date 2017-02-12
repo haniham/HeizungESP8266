@@ -1,7 +1,7 @@
 #include "vaillant.h"
 
 // checked
-byte calculateCRC(byte* stringptr, byte len) {
+byte calculateCRC(byte* data, byte len) {
   byte checksum = 0;
   byte i = 0;
   for(i=0;i<len;i++)
@@ -21,7 +21,7 @@ byte calculateCRC(byte* stringptr, byte len) {
   return checksum;
 }
 
-boolean checkCRC(byte* stringptr, byte len) {
+boolean checkCRC(byte* data, byte len) {
   return calculateCRC(stringptr, len-1) == stringptr[len-1];
 }
 
