@@ -21,6 +21,10 @@ byte calculateCRC(byte* stringptr, byte len) {
   return checksum;
 }
 
+boolean checkCRC(byte* stringptr, byte len) {
+  return calculateCRC(stringptr, len-1) == stringptr[len-1];
+}
+
 char getNumChar(byte num) {
   if(num<=9)
     return num + '0';
