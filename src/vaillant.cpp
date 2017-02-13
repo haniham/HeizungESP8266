@@ -34,62 +34,126 @@ char getNumChar(byte num) {
     return '0';
 }
 
-boolean readParam(byte paramNr,char* stringptr, byte stringlen) {
+void writeDebugBytes(byte* data, byte dataLenth) {
+  for(byte i = 0; i<dataLenth;i++) {
+    SerialDebug.print(data[i],HEX);
+    SerialDebug.print(' ');
+  }
+}
+
+int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
+
   SerialDebug.print("Reading Parameter");
   SerialDebug.println(paramNr);
 
   //Make the Request
-  byte request[7] = {7,0,  0,0,paramNr,5, '\0'};
-  request[6] = calculateCRC(request,6);
+  byte request[readParamRequestLenth] = {0x07,0x00,0x00,0x00,paramNr,0x05, 0x00};
+  request[readParamRequestLenth-1] = calculateCRC(request,readParamRequestLenth-1);
+  SerialDebug.print("Request: ");
+  writeDebugBytes(request, readParamRequestLenth);
+  Serial.println();
 
   //Sending Request
-  int i =0;
-  for(;i<7;i++)
+  for(byte i = 0; i<7; i++)
     SerialVaillant.write(request[i]);
 
-  Stream &streamVaillant = SerialVaillant;
-  streamVaillant.setTimeout(1000);
-  byte receiveBuffer[50];
+  SerialVaillant.setTimeout(1000);
 
-  //read first Byte
-  if(streamVaillant.readBytes(receiveBuffer,1)!=1) {
+  //Read first Byte
+  if(SerialVaillant.readBytes(resultBytePtr,1)!=1) {
     SerialDebug.println("nothing receieved");
-    return false;
+    return 0;
   }
 
-  byte transmissionLenth = receiveBuffer[0];
+  //Receive length calculation
+  byte receiveLength = resultBytePtr[0];
+  if(receiveLength>resultByteLength) {
+    SerialDebug.print("Vaillant wants to send ");
+    SerialDebug.print(receiveLength);
+    SerialDebug.print(" bytes, but only ");
+    SerialDebug.print(resultByteLength);
+    SerialDebug.println(" bytes as buffer");
 
-  if(transmissionLenth>50) {
-    SerialDebug.println("bigger 50");
-    return false;
+    receiveLength = resultByteLength;
   }
 
-  byte awaitedBytes = transmissionLenth-1;
+  byte awaitedBytes = receiveLength-1;
 
   SerialDebug.print("Awaiting ");
   SerialDebug.print(awaitedBytes);
-  SerialDebug.println("bytes");
+  SerialDebug.println(" additional bytes");
 
-  if(streamVaillant.readBytes(&(receiveBuffer[1]),awaitedBytes)!=awaitedBytes) {
-    SerialDebug.print("nothing receieved2");
-    return false;
+  //Check Length
+  byte receivedBytes2 = SerialVaillant.readBytes(&(resultBytePtr[1]),awaitedBytes);
+  if(receivedBytes2!=awaitedBytes) {
+    SerialDebug.print("Awaited ");
+    SerialDebug.print(awaitedBytes);
+    SerialDebug.print(" bytes, but received ");
+    SerialDebug.print(receivedBytes2);
+    SerialDebug.println(" before Timeout");
+    return (receivedBytes2+1)*-1;
   }
 
-  int j =0;
-  for(;j<transmissionLenth;j++){
-    int j3= 3*j;
-    stringptr[j3]=getNumChar(receiveBuffer[j]>>4);
-    stringptr[j3+1]=getNumChar(receiveBuffer[j]&0xF);
-    stringptr[j3+2]=' ';
-
-    if((j3+5)>(stringlen-1))
-      break;
+  //Final CRC Check
+  if(checkCRC(resultBytePtr, receivedBytes2+1)) {
+    return receivedBytes2+1;
+  } else {
+    SerialDebug.print("CRC Fail");
+    return (receivedBytes2+1)*-1;
   }
-  stringptr[j*3]='\0';
-  stringptr[stringlen-1] = '\0';
-  SerialDebug.println(stringptr);
+}
 
-  return true;
+String parse1ByteAnalog(byte data){
+  return String(data);
+}
 
+String parse1ByteSensorstatus(byte data) {
+  switch (data) {
+    case 0x00: return "kein Fehler";
+    case 0x55: return "Kurzschluss";
+    case 0xAA: return "Unterbrechung";
+  }
+  return "NaN";
+}
+
+String parse1ByteSchaltzustand(byte data) {
+  switch (data) {
+    case 0xF0:
+    case 0x00: return "Inaktiv";
+    case 0x0F:
+    case 0x01: return "Aktiv";
+  }
+  return "NaN";
+}
+
+String parse2Bytes(byte* data) {
+  int16_t number = (data[0]<<8)|data[1];
+  return String(number/(16.0f));
+}
+
+String parse3Bytes(byte* data) {
+  return parse2Bytes(data) + parse1ByteSensorstatus(data[2]);
+}
+
+String parseParam(byte paramNr, byte* data, byte dataLength){
+  byte offsetFreeDataLength = dataLength - 3;
+  byte* offsetFreeData = &(data[2]);
+
+  String schaltzustand;
+  switch (offsetFreeDataLength) {
+    case 1:
+      schaltzustand = parse1ByteSchaltzustand(offsetFreeData[0]);
+      if(schaltzustand.equals("NaN")){
+        return parse1ByteAnalog(offsetFreeData[0]);
+      } else {
+        return schaltzustand;
+      }
+    case 2:
+      return parse2Bytes(offsetFreeData);
+    case 3:
+      return parse3Bytes(offsetFreeData);
+    default:
+    return "NaN";
+  }
 
 }

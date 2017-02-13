@@ -6,10 +6,12 @@
 
 #define SerialVaillant Serial
 #define SerialDebug Serial1
+#define readParamRequestLenth 7
 
 byte calculateCRC(byte* data, byte len);
 boolean checkCRC(byte* data, byte len);
 
-boolean readParam(byte paramNr,char* stringptr,byte stringlen);
+int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength);
+String parseParam(byte paramNr, byte* data, byte dataLength);
 
 #endif

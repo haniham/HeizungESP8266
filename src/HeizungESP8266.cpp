@@ -110,14 +110,14 @@ void loop() {
   client.loop();
 
   char array[200];
-  if(readParam(paramNr, array,200)){
+  /*if(readParam(paramNr, array,200)){
     char topic [30]="haniham/Param";
     topic[13] = '0' + paramNr/10;
     topic[14] = '0' + paramNr%10;
     topic[15] = '\0';
     //Publish
     client.publish(topic, array);
-  }
+  }*/
 
   paramNr++;
   //if(paramNr>=0xD6)
