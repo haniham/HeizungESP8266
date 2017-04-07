@@ -1,7 +1,8 @@
 # HeizungESP8266
 
-Our present time demands for more interaction of all household components. 
-Thus expensive components need to be extended with an interface to communicate with the rest of the sart home.
+Our present time demands for more interaction of all household components.
+Many older components do not provide a connection to other smart home components.
+Thus expensive components need to be extended with an interface to communicate with the rest of the smart home.
 
 Here i will extend our Vaillant VKO 246 heater with an VRC 420 control with a Wifi Chip. 
 The ESP8266 which will be used here, has become quite popular on makers.
