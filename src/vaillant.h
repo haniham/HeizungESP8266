@@ -11,7 +11,7 @@
 byte calculateCRC(byte* data, byte len);
 boolean checkCRC(byte* data, byte len);
 
-int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength);
+byte readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength);
 String parseParam(byte paramNr, byte* data, byte dataLength);
 
 #endif

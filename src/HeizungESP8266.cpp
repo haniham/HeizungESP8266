@@ -109,15 +109,16 @@ void loop() {
   }
   client.loop();
 
-  char array[200];
-  /*if(readParam(paramNr, array,200)){
+  byte array[200];
+  int len = readParam(paramNr, array, 200);
+  if(len>0){
     char topic [30]="haniham/Param";
     topic[13] = '0' + paramNr/10;
     topic[14] = '0' + paramNr%10;
     topic[15] = '\0';
     //Publish
-    client.publish(topic, array);
-  }*/
+    client.publish(topic, (char*) array);
+  }
 
   paramNr++;
   //if(paramNr>=0xD6)

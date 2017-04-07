@@ -41,7 +41,7 @@ void writeDebugBytes(byte* data, byte dataLenth) {
   }
 }
 
-int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
+byte readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
 
   SerialDebug.print("Reading Parameter");
   SerialDebug.println(paramNr);
@@ -51,7 +51,7 @@ int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
   request[readParamRequestLenth-1] = calculateCRC(request,readParamRequestLenth-1);
   SerialDebug.print("Request: ");
   writeDebugBytes(request, readParamRequestLenth);
-  Serial.println();
+  SerialDebug.println();
 
   //Sending Request
   for(byte i = 0; i<7; i++)
@@ -106,6 +106,8 @@ int readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
 String parse1ByteAnalog(byte data){
   return String(data);
 }
+//TODO
+//String parse(byte[])
 
 String parse1ByteSensorstatus(byte data) {
   switch (data) {
