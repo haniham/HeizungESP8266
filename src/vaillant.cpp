@@ -42,12 +42,20 @@ void writeDebugBytes(byte* data, byte dataLenth) {
 }
 
 byte readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength) {
+  // For a Parameter Request the debug Byte is 0
+  return readRequest(0,paramNr, resultBytePtr, resultByteLength);
+}
 
-  SerialDebug.print("Reading Parameter");
+byte readRequest(byte debugByte, byte paramNr,byte* resultBytePtr, byte resultByteLength) {
+  if(debugByte==0)
+    SerialDebug.print("Reading Parameter");
+  else
+    SerialDebug.print("General Read Request");
+
   SerialDebug.println(paramNr);
 
   //Make the Request
-  byte request[readParamRequestLenth] = {0x07,0x00,0x00,0x00,paramNr,0x05, 0x00};
+  byte request[readParamRequestLenth] = {0x07,0x00,debugByte,0x00,paramNr,0x05, 0x00};
   request[readParamRequestLenth-1] = calculateCRC(request,readParamRequestLenth-1);
   SerialDebug.print("Request: ");
   writeDebugBytes(request, readParamRequestLenth);
