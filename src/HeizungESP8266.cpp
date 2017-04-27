@@ -119,22 +119,35 @@ void loop() {
 
   int len;
   if(paramNr==-1)
+  {
+    // Read error log
     len = readRequest(1, paramNr, array, resArrayLen);
+
+    if(len>0){
+      client.publish("haniham/ErrorLog", (char*) array);
+    }
+
+  }
   else
+  {
     len = readParam(paramNr, array, resArrayLen);
 
-  //Len >0 ==> valid result
-  if(len>0){
-    //make MQTT topic
-    char topic [30]="haniham/Param";
-    topic[13] = '0' + paramNr/10;
-    topic[14] = '0' + paramNr%10;
-    topic[15] = '\0';
-    //Publish MQTT message
-    client.publish(topic, (char*) array);
+    //Len >0 ==> valid result
+    if(len>0){
+      //make MQTT topic
+      char topic [30]="haniham/Raw/Param";
+      topic[17] = '0' + paramNr/100;
+      topic[18] = '0' + (paramNr/10)%10;
+      topic[19] = '0' + paramNr%10;
+      topic[20] = '\0';
+      //Publish MQTT message
+      client.publish(topic, (char*) array);
+    }
   }
 
-  
+
+
+
 
   paramNr++;
   if(paramNr>paramNrMax)
