@@ -99,8 +99,9 @@ void setup() {
   Serial1.println("Vaillant ESP8266");
 }
 
-
-byte paramNr = 0;
+const int paramNrDefault = -1;
+const int paramNrMax = 255;
+int paramNr = paramNrDefault;
 
 void loop() {
 
@@ -115,7 +116,12 @@ void loop() {
   //read Parameter
   byte resArrayLen = 50;
   byte array[resArrayLen];
-  int len = readParam(paramNr, array, resArrayLen);
+
+  int len;
+  if(paramNr==-1)
+    len = readRequest(1, paramNr, array, resArrayLen);
+  else
+    len = readParam(paramNr, array, resArrayLen);
 
   //Len >0 ==> valid result
   if(len>0){
@@ -126,13 +132,13 @@ void loop() {
     topic[15] = '\0';
     //Publish MQTT message
     client.publish(topic, (char*) array);
-
-
   }
 
+  
+
   paramNr++;
-  //if(paramNr>=0xD6)
-    //paramNr=0;
+  if(paramNr>paramNrMax)
+    paramNr=paramNrDefault;
 
   delay(100);
 }
