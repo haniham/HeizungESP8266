@@ -89,14 +89,14 @@ void reconnect() {
 
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-  Serial.begin(9600);
-  Serial1.begin(115200);
+  Serial.begin(9600);               // Vaillant Serial Port
+  Serial1.begin(115200);            // Debug Serial Port
   Serial1.println('\0');
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
-  Serial1.println("Test");
+  Serial1.println("Vaillant ESP8266");
 }
 
 
@@ -104,20 +104,30 @@ byte paramNr = 0;
 
 void loop() {
 
+  //If the Client has lost connection --> reconnect
   if (!client.connected()) {
     reconnect();
   }
+
+  //check MQTT for new messages
   client.loop();
 
-  byte array[200];
-  int len = readParam(paramNr, array, 200);
+  //read Parameter
+  byte resArrayLen = 50;
+  byte array[resArrayLen];
+  int len = readParam(paramNr, array, resArrayLen);
+
+  //Len >0 ==> valid result
   if(len>0){
+    //make MQTT topic
     char topic [30]="haniham/Param";
     topic[13] = '0' + paramNr/10;
     topic[14] = '0' + paramNr%10;
     topic[15] = '\0';
-    //Publish
+    //Publish MQTT message
     client.publish(topic, (char*) array);
+
+
   }
 
   paramNr++;
