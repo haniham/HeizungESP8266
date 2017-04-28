@@ -16,7 +16,7 @@ struct Parameterelement{
 };
 
 //Array holding all parameteremlements
-Parameterelement parameterelements[] = {
+const Parameterelement parameterelements[] = {
   {4,"Sollwert_Speicher",Analog2b},
   {5,"Flammsignal",Stat0F},
   {23,"Speichertemperatur",Analog2b_Sensor},
@@ -30,5 +30,5 @@ byte parameterelementsSize = sizeof (parameterelements) / sizeof *(parameterelem
 / Searches the Parameterelements for the corresponding element
 / Returns NULL if not found
 */
-Parameterelement* getParameterelement(byte parameterNr);
+const Parameterelement* getParameterelement(byte parameterNr);
 #endif

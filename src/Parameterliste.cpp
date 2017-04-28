@@ -1,6 +1,6 @@
 #include "Parameterliste.h"
 
-Parameterelement* getParameterelement(byte parameterNr)
+const Parameterelement* getParameterelement(byte parameterNr)
 {
   //Performing a search over all elements
   for(byte i=0;i<parameterelementsSize;i++)
