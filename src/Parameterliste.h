@@ -8,6 +8,12 @@
 //Enum for holding the Type of parameter
 enum Parametertyp {Keiner, Stat01, Stat0F, Analog1b, Analog2b, Analog2b_Sensor };
 
+/*
+/ returns length of the Parametertyp
+/ 0 for undefined length
+*/
+byte getParametertypLenth(Parametertyp parametertyp);
+
 //Structure holding the Parameter Number, its Name and the PArameter Type
 struct Parameterelement{
   byte Nr;
