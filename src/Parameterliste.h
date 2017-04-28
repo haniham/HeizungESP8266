@@ -24,7 +24,7 @@ const Parameterelement parameterelements[] = {
   {57,"Sollwert_Vorlauf",Analog2b},
   {68,"Interne_Heizungspumpe",Stat01}
 };
-byte parameterelementsSize = sizeof (parameterelements) / sizeof *(parameterelements);
+const byte parameterelementsSize = sizeof (parameterelements) / sizeof *(parameterelements);
 
 /*
 / Searches the Parameterelements for the corresponding element

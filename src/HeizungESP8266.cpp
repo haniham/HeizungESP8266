@@ -4,6 +4,7 @@
 #include <PubSubClient.h>
 
 #include "vaillant.h"
+#include "Parameterliste.h"
 
 // Update these with values suitable for your network.
 
@@ -142,6 +143,9 @@ void loop() {
       topic[20] = '\0';
       //Publish MQTT message
       client.publish(topic, (char*) array);
+
+      //Start Parsing
+      const Parameterelement* parameterelement = getParameterelement(paramNr);
     }
   }
 
