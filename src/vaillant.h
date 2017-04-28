@@ -3,6 +3,7 @@
 
 #include <arduino.h>
 #include <Stream.h>
+#include "Parameterliste.h"
 
 #define SerialVaillant Serial
 #define SerialDebug Serial1
@@ -21,5 +22,11 @@ byte readRequest(byte debugByte, byte paramNr,byte* resultBytePtr, byte resultBy
 byte readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength);
 
 String parseParam(byte paramNr, byte* data, byte dataLength);
+
+/*
+/ Parses the telegram and returns the String
+/ Returns an empty string if unsuccessful
+*/
+String parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength);
 
 #endif

@@ -167,3 +167,34 @@ String parseParam(byte paramNr, byte* data, byte dataLength){
   }
 
 }
+
+String parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength){
+  byte dataLength = telegramLength - 3;
+
+  //nothing todo when keiner
+  if(parametertyp == Keiner){
+    SerialDebug.println("Parametertyp Keiner - Nothing TODO");
+    return "";
+  }
+
+  //Check length of received Data
+  if(dataLength!=getParametertypLenth(parametertyp)) {
+    SerialDebug.println("Parametertyp Lenth mismatch");
+    SerialDebug.print(parametertyp);
+    SerialDebug.print(" requires ");
+    SerialDebug.print(getParametertypLenth(parametertyp));
+    SerialDebug.print(" bytes, but telegram only contains");
+    SerialDebug.print(dataLength);
+    SerialDebug.println(" bytes");
+    return "";
+  }
+
+  switch(parametertyp) {
+      case Stat01:
+      case Stat0F: return parse1ByteSchaltzustand(telegramData[0]);
+
+      case Analog1b:  return parse1ByteAnalog(telegramData[0]);
+      case Analog2b:  return parse2Bytes(telegramData);
+      case Analog2b_Sensor: return parse3Bytes(telegramData);
+  }
+}
