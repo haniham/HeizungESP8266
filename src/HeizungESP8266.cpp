@@ -12,6 +12,7 @@
 const char* ssid = "FRITZ!Box 6490 Cable";
 const char* password = "Hanirulesthisnetwork";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
+//TODO Topic Constant
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -141,11 +142,23 @@ void loop() {
       topic[18] = '0' + (paramNr/10)%10;
       topic[19] = '0' + paramNr%10;
       topic[20] = '\0';
-      //Publish MQTT message
+      //Publish MQTT message //TODO  better output of data
       client.publish(topic, (char*) array);
 
       //Start Parsing
-      const Parameterelement* parameterelement = getParameterelement(paramNr);
+      const Parameterelement* parameterElement = getParameterelement(paramNr);
+      if(parameterElement!=NULL)
+      {
+        //Only preceeding if an element was returned
+        String parseResult = parseTelegram(paramNr, parameterElement->parametertyp, array, len);
+        if(!parseResult.equals(""))
+        {
+          char topic [30];
+          sprintf(topic, "haniham/%.20s", parameterElement->parametertyp);
+          client.publish(topic,parseResult.c_str());
+        }
+
+      }
     }
   }
 
