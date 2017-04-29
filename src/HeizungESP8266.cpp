@@ -153,8 +153,8 @@ void loop() {
         String parseResult = parseTelegram(paramNr, parameterElement->parametertyp, array, len);
         if(!parseResult.equals(""))
         {
-          char topic [30];
-          sprintf(topic, "haniham/%.20s", parameterElement->parametertyp);
+          char topic [30]; //TODO !no limit check
+          sprintf(topic, "haniham/%s", (parameterElement->Name).c_str());
           client.publish(topic,parseResult.c_str());
         }
 

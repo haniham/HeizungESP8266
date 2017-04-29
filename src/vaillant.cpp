@@ -191,10 +191,10 @@ String parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegram
 
   switch(parametertyp) {
       case Stat01:
-      case Stat0F: return parse1ByteSchaltzustand(telegramData[0]);
+      case Stat0F: return parse1ByteSchaltzustand(telegramData[2]);
 
-      case Analog1b:  return parse1ByteAnalog(telegramData[0]);
-      case Analog2b:  return parse2Bytes(telegramData);
-      case Analog2b_Sensor: return parse3Bytes(telegramData);
+      case Analog1b:  return parse1ByteAnalog(telegramData[2]);
+      case Analog2b:  return parse2Bytes(&telegramData[2]);
+      case Analog2b_Sensor: return parse3Bytes(&telegramData[2]);
   }
 }
