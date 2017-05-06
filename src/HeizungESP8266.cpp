@@ -9,9 +9,17 @@
 // Update these with values suitable for your network.
 
 //const char* ssid = "VodafoneSharingDock_CC4810";
-const char* ssid = "FRITZ!Box 6490 Cable";
-const char* password = "Hanirulesthisnetwork";
+const char* ssid        = "FRITZ!Box 6490 Cable";
+const char* password    = "Hanirulesthisnetwork";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
+const String MQTT_GeneralTopic  = "haniham";
+const String MQTT_ErrorTopic    = MQTT_GeneralTopic + "/ErrorLog";
+const String MQTT_RawTopic      = MQTT_GeneralTopic + "/Raw/Param%3d";
+const unsigned int MQTT_RawTopicLength    = MQTT_RawTopic.length() + 2 ; //+1 Digits for /0 and 1 for safety
+const unsigned int MQTT_RawMessageBytes   = 50;
+const String MQTT_ParameterTopic = MQTT_GeneralTopic + "/%s";
+const unsigned int MQTT_ParameterTopicLength = MQTT_ParameterTopic.length() + 30; // the offset directle refelcts to the maximum parameter name length
+
 //TODO Topic Constant
 
 WiFiClient espClient;
@@ -126,7 +134,7 @@ void loop() {
     len = readRequest(1, paramNr, array, resArrayLen);
 
     if(len>0){
-      client.publish("haniham/ErrorLog", (char*) array);
+      client.publish(MQTT_ErrorTopic.c_str(), (char*) array);
     }
 
   }
@@ -136,14 +144,28 @@ void loop() {
 
     //Len >0 ==> valid result
     if(len>0){
-      //make MQTT topic
-      char topic [30]="haniham/Raw/Param";
-      topic[17] = '0' + paramNr/100;
-      topic[18] = '0' + (paramNr/10)%10;
-      topic[19] = '0' + paramNr%10;
-      topic[20] = '\0';
-      //Publish MQTT message //TODO  better output of data
-      client.publish(topic, (char*) array);
+      //Publish RAW Data - TODO Make funtion
+
+      //Make Topic
+      char rawTopic [MQTT_RawTopicLength];
+      snprintf(rawTopic,MQTT_RawTopicLength,MQTT_RawTopic.c_str(),paramNr);
+
+      //Make Message
+      char rawMessage [MQTT_RawMessageBytes*3];
+      int i;
+      for(i= 0;(i<len)&&(i<MQTT_RawMessageBytes);i++)
+      {
+        const char* hexchars= "0123456789ABCDEF";
+        rawMessage[i*3] = hexchars[(array[i]>>4) & 0xF];
+        rawMessage[i*3+1] = hexchars[array[i] & 0xF];
+        rawMessage[i*3+2] = ' ';
+      }
+      rawMessage[i*3-1] = '\0'; //Add zero Terminal on final char
+
+      //Publish data
+      client.publish(rawTopic, rawMessage);
+
+      //Parse Data  - TODO Make funtion
 
       //Start Parsing
       const Parameterelement* parameterElement = getParameterelement(paramNr);
@@ -153,18 +175,14 @@ void loop() {
         String parseResult = parseTelegram(paramNr, parameterElement->parametertyp, array, len);
         if(!parseResult.equals(""))
         {
-          char topic [30]; //TODO !no limit check
-          sprintf(topic, "haniham/%s", (parameterElement->Name).c_str());
-          client.publish(topic,parseResult.c_str());
+          char parseTopic [MQTT_ParameterTopicLength];
+          snprintf(parseTopic,MQTT_ParameterTopicLength, MQTT_ParameterTopic.c_str(), (parameterElement->Name).c_str());
+          client.publish(parseTopic,parseResult.c_str());
         }
 
       }
     }
   }
-
-
-
-
 
   paramNr++;
   if(paramNr>paramNrMax)
