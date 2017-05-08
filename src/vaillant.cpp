@@ -117,7 +117,7 @@ String parse1ByteAnalog(byte data){
 //TODO
 //String parse(byte[])
 
-String parse1ByteSensorstatus(byte data) {
+const String parse1ByteSensorstatus(byte data) {
   switch (data) {
     case 0x00: return "kein Fehler";
     case 0x55: return "Kurzschluss";
@@ -126,7 +126,7 @@ String parse1ByteSensorstatus(byte data) {
   return "NaN";
 }
 
-String parse1ByteSchaltzustand(byte data) {
+const String parse1ByteSchaltzustand(byte data) {
   switch (data) {
     case 0xF0:
     case 0x00: return "Inaktiv";
@@ -136,22 +136,28 @@ String parse1ByteSchaltzustand(byte data) {
   return "NaN";
 }
 
-String parse2Bytes(byte* data) {
+const String parse2Bytes(byte* data) {
   int16_t number = (data[0]<<8)|data[1];
   return String(number/(16.0f));
 }
 
-String parse3Bytes(byte* data) {
-  return parse2Bytes(data) + parse1ByteSensorstatus(data[2]);
+const ParseResult parse3Bytes(byte* data) {
+  return ParseResult{parse2Bytes(data),parse1ByteSensorstatus(data[2])};
 }
 
-String parseParam(byte paramNr, byte* data, byte dataLength){
+ParseResult parseParam(byte paramNr, byte* data, byte dataLength){
   byte offsetFreeDataLength = dataLength - 3;
   byte* offsetFreeData = &(data[2]);
 
   String schaltzustand;
   switch (offsetFreeDataLength) {
     case 1:
+      const Parameterelement* parameterelementPtr = getParameterelement(paramNr);
+      if(parameterelementPtr->parametertyp == Stat01 || (parameterelementPtr->parametertyp ==  Stat0F)
+      {
+
+      }
+      else if(parameterelementPtr->parametertyp == Analog1b)
       schaltzustand = parse1ByteSchaltzustand(offsetFreeData[0]);
       if(schaltzustand.equals("NaN")){
         return parse1ByteAnalog(offsetFreeData[0]);

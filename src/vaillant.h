@@ -9,6 +9,8 @@
 #define SerialDebug Serial1
 #define readParamRequestLenth 7
 
+struct ParseResult{ String value; String state;};
+
 byte calculateCRC(byte* data, byte len);
 boolean checkCRC(byte* data, byte len);
 
