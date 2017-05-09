@@ -6,7 +6,11 @@
 #include <string>
 
 //Enum for holding the Type of parameter
-enum Parametertyp {Keiner, Stat01, Stat0F, Analog1b, Analog2b, Analog2b_Sensor };
+enum Parametertyp {Keiner=0, Stat01, Stat0F, Analog1b, Analog2b, Analog2b_Sensor };
+// Hplding the Name for the Enums
+const char* ParametertypName[] = {"Keiner", "Stat01", "Stat0F", "Analog1b", "Analog2b", "Analog2b_Sensor"};
+//Returning the Name of the Enum
+const char* getParametertypName(Parametertyp parametertyp);
 
 /*
 / returns length of the Parametertyp

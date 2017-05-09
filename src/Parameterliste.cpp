@@ -1,5 +1,9 @@
 #include "Parameterliste.h"
 
+const char* getParametertypName(Parametertyp parametertyp) {
+  return ParametertypName[parametertyp];
+}
+
 byte getParametertypLenth(Parametertyp parametertyp){
   switch (parametertyp) {
     case Keiner:          return 0;
