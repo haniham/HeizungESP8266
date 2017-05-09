@@ -9,7 +9,7 @@
 #define SerialDebug Serial1
 #define readParamRequestLenth 7
 
-struct ParseResult{ String value; String state;};
+struct ParseResult{ String value; String state; String error;};
 
 byte calculateCRC(byte* data, byte len);
 boolean checkCRC(byte* data, byte len);
@@ -23,12 +23,12 @@ byte readRequest(byte debugByte, byte paramNr,byte* resultBytePtr, byte resultBy
 */
 byte readParam(byte paramNr,byte* resultBytePtr, byte resultByteLength);
 
-String parseParam(byte paramNr, byte* data, byte dataLength);
+ParseResult parseParam(byte paramNr, byte* data, byte dataLength);
 
 /*
 / Parses the telegram and returns the String
 / Returns an empty string if unsuccessful
 */
-String parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength);
+ParseResult parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength);
 
 #endif

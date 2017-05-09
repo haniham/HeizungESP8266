@@ -114,8 +114,6 @@ byte readRequest(byte debugByte, byte paramNr,byte* resultBytePtr, byte resultBy
 String parse1ByteAnalog(byte data){
   return String(data);
 }
-//TODO
-//String parse(byte[])
 
 const String parse1ByteSensorstatus(byte data) {
   switch (data) {
@@ -142,65 +140,38 @@ const String parse2Bytes(byte* data) {
 }
 
 const ParseResult parse3Bytes(byte* data) {
-  return ParseResult{parse2Bytes(data),parse1ByteSensorstatus(data[2])};
+  return ParseResult{parse2Bytes(data),parse1ByteSensorstatus(data[2]),""};
 }
 
-ParseResult parseParam(byte paramNr, byte* data, byte dataLength){
-  byte offsetFreeDataLength = dataLength - 3;
-  byte* offsetFreeData = &(data[2]);
-
-  String schaltzustand;
-  switch (offsetFreeDataLength) {
-    case 1:
-      const Parameterelement* parameterelementPtr = getParameterelement(paramNr);
-      if(parameterelementPtr->parametertyp == Stat01 || (parameterelementPtr->parametertyp ==  Stat0F)
-      {
-
-      }
-      else if(parameterelementPtr->parametertyp == Analog1b)
-      schaltzustand = parse1ByteSchaltzustand(offsetFreeData[0]);
-      if(schaltzustand.equals("NaN")){
-        return parse1ByteAnalog(offsetFreeData[0]);
-      } else {
-        return schaltzustand;
-      }
-    case 2:
-      return parse2Bytes(offsetFreeData);
-    case 3:
-      return parse3Bytes(offsetFreeData);
-    default:
-    return "NaN";
-  }
-
-}
-
-String parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength){
+ParseResult parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength){
   byte dataLength = telegramLength - 3;
 
   //nothing todo when keiner
   if(parametertyp == Keiner){
-    SerialDebug.println("Parametertyp Keiner - Nothing TODO");
-    return "";
+    char ErrorKeiner[] = "Parametertyp Keiner - Nothing TODO";
+    SerialDebug.println(ErrorKeiner);
+    return ParseResult{"","",ErrorKeiner};
   }
 
   //Check length of received Data
   if(dataLength!=getParametertypLenth(parametertyp)) {
-    SerialDebug.println("Parametertyp Lenth mismatch");
-    SerialDebug.print(parametertyp);
-    SerialDebug.print(" requires ");
-    SerialDebug.print(getParametertypLenth(parametertyp));
-    SerialDebug.print(" bytes, but telegram only contains");
-    SerialDebug.print(dataLength);
-    SerialDebug.println(" bytes");
-    return "";
+    String errorParameter = "Parametertyp Lenth mismatch\n\r";
+    errorParameter += getParametertypName(parametertyp);
+    errorParameter += " requires ";
+    errorParameter += getParametertypLenth(parametertyp);
+    errorParameter += " bytes, but telegram only contains ";
+    errorParameter += dataLength;
+    errorParameter += " bytes";
+    SerialDebug.println(errorParameter);
+    return ParseResult{"","",errorParameter};
   }
 
   switch(parametertyp) {
       case Stat01:
-      case Stat0F: return parse1ByteSchaltzustand(telegramData[2]);
+      case Stat0F: return ParseResult{"",parse1ByteSchaltzustand(telegramData[2]),""};
 
-      case Analog1b:  return parse1ByteAnalog(telegramData[2]);
-      case Analog2b:  return parse2Bytes(&telegramData[2]);
+      case Analog1b:  return ParseResult{parse1ByteAnalog(telegramData[2]),"",""};
+      case Analog2b:  return ParseResult{parse2Bytes(&telegramData[2]),"",""};
       case Analog2b_Sensor: return parse3Bytes(&telegramData[2]);
   }
 }

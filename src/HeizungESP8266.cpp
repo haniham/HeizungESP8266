@@ -17,8 +17,8 @@ const String MQTT_ErrorTopic    = MQTT_GeneralTopic + "/ErrorLog";
 const String MQTT_RawTopic      = MQTT_GeneralTopic + "/Raw/Param%3d";
 const unsigned int MQTT_RawTopicLength    = MQTT_RawTopic.length() + 2 ; //+1 Digits for /0 and 1 for safety
 const unsigned int MQTT_RawMessageBytes   = 50;
-const String MQTT_ParameterTopic = MQTT_GeneralTopic + "/%s";
-const unsigned int MQTT_ParameterTopicLength = MQTT_ParameterTopic.length() + 30; // the offset directle refelcts to the maximum parameter name length
+const String MQTT_ParameterTopic = MQTT_GeneralTopic + "/%s/%s";
+const unsigned int MQTT_ParameterTopicLength = MQTT_ParameterTopic.length() + 50; // the offset directle refelcts to the maximum parameter name length
 
 //TODO Topic Constant
 
@@ -172,12 +172,22 @@ void loop() {
       if(parameterElement!=NULL)
       {
         //Only preceeding if an element was returned
-        String parseResult = parseTelegram(paramNr, parameterElement->parametertyp, array, len);
-        if(!parseResult.equals(""))
+        ParseResult parseResult = parseTelegram(paramNr, parameterElement->parametertyp, array, len);
+        if(!parseResult.value.equals(""))
         {
           char parseTopic [MQTT_ParameterTopicLength];
-          snprintf(parseTopic,MQTT_ParameterTopicLength, MQTT_ParameterTopic.c_str(), (parameterElement->Name).c_str());
-          client.publish(parseTopic,parseResult.c_str());
+          snprintf(parseTopic,MQTT_ParameterTopicLength, MQTT_ParameterTopic.c_str(), (parameterElement->Name).c_str(),"value");
+          client.publish(parseTopic,parseResult.value.c_str());
+        }
+        if(!parseResult.state.equals(""))
+        {
+          char parseTopic [MQTT_ParameterTopicLength];
+          snprintf(parseTopic,MQTT_ParameterTopicLength, MQTT_ParameterTopic.c_str(), (parameterElement->Name).c_str(),"state");
+          client.publish(parseTopic,parseResult.state.c_str());
+        }
+        if(!parseResult.error.equals(""))
+        {
+          client.publish(MQTT_ErrorTopic,parseResult.state.c_str());
         }
 
       }
