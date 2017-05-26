@@ -187,7 +187,7 @@ void loop() {
         }
         if(!parseResult.error.equals(""))
         {
-          client.publish(MQTT_ErrorTopic,parseResult.state.c_str());
+          client.publish(MQTT_ErrorTopic.c_str(),parseResult.state.c_str());
         }
 
       }
