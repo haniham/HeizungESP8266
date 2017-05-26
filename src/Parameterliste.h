@@ -8,7 +8,7 @@
 //Enum for holding the Type of parameter
 enum Parametertyp {Keiner=0, Stat01, Stat0F, Analog1b, Analog2b, Analog2b_Sensor,Fehlerspeicher };
 // Hplding the Name for the Enums
-const char* ParametertypName[] = {"Keiner", "Stat01", "Stat0F", "Analog1b", "Analog2b", "Analog2b_Sensor", "Fehlerspeicher"};
+extern const char* ParametertypName[];
 //Returning the Name of the Enum
 const char* getParametertypName(Parametertyp parametertyp);
 

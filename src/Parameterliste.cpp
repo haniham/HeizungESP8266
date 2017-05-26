@@ -1,5 +1,7 @@
 #include "Parameterliste.h"
 
+const char* ParametertypName[] = {"Keiner", "Stat01", "Stat0F", "Analog1b", "Analog2b", "Analog2b_Sensor", "Fehlerspeicher"};
+
 const char* getParametertypName(Parametertyp parametertyp) {
   return ParametertypName[parametertyp];
 }
