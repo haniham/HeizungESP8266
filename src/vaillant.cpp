@@ -143,6 +143,33 @@ const ParseResult parse3Bytes(byte* data) {
   return ParseResult{parse2Bytes(data),parse1ByteSensorstatus(data[2]),""};
 }
 
+//Evaluates the position of the set MSB
+uint8_t getSetMSBPosition(byte* data) {
+  for(uint8_t i = 0;i<=9;i++) {
+    if(data[i] & 0x80)
+      return i+1;
+  }
+  return 0;
+}
+
+const ParseResult parseFehlerspeicher(byte* data) {
+  uint8_t setMSBPosition = getSetMSBPosition(data);
+
+  char fehlerspeicher[]="00 11 22 33 44 55 66 77 88 99";
+  for(int8_t i=0, pos=setMSBPosition-1;i<=9;i++,pos--) {
+    if(pos<0)
+      pos+=10;
+
+    byte fehlerspeicherelement =  data[pos];
+
+    const char* hexchars= "0123456789ABCDEF";
+    fehlerspeicher[i*3]= hexchars[fehlerspeicherelement>>4];
+    fehlerspeicher[i*3+1]= hexchars[fehlerspeicherelement&0xF];
+  }
+
+  return ParseResult{fehlerspeicher,String(setMSBPosition)};
+}
+
 ParseResult parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* telegramData, byte telegramLength){
   byte dataLength = telegramLength - 3;
 
@@ -173,5 +200,7 @@ ParseResult parseTelegram(byte ParameterNr, Parametertyp parametertyp, byte* tel
       case Analog1b:  return ParseResult{parse1ByteAnalog(telegramData[2]),"",""};
       case Analog2b:  return ParseResult{parse2Bytes(&telegramData[2]),"",""};
       case Analog2b_Sensor: return parse3Bytes(&telegramData[2]);
+
+      case Fehlerspeicher: return parseFehlerspeicher(telegramData);
   }
 }

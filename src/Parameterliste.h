@@ -40,6 +40,7 @@ const Parameterelement parameterelements[] = {
   {32,"Anzahl_STB_Abschaltungen",Analog1b},
   {36,"Drezahlsollwert",Analog2b},
   {37,"Sollwert_Vorlauf_Ext_Regler",Analog2b},
+  {38,"Fehlerspeicher",Fehlerspeicher},
   {56,"Verbleibende_Brennersperrzeit",Analog1b},
   {57,"Sollwert_Vorlauf",Analog2b},
   {63,"Externe_Heizungspumpe",Stat01},
